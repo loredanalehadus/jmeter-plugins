@@ -5,13 +5,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
@@ -29,6 +23,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 
     com.googlecode.jmeter.plugins.webdriver.sampler.gui.JSyntaxTextArea script;
     JComboBox<String> languages;
+    JButton buildButton;
+    JLabel output;
 
     public WebDriverSamplerGui() {
         createGui();
@@ -85,6 +81,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         box.add(JMeterPluginsUtils.addHelpLinkToPanel(makeTitlePanel(), "WebDriverSampler"));
         box.add(createParameterPanel());
         box.add(createLangPanel());
+        box.add(createBuildButton());
+        box.add(output);
         add(box, BorderLayout.NORTH);
 
         JPanel panel = createScriptPanel();
@@ -162,4 +160,21 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 
         return panel;
     }
+
+     private JButton createBuildButton(){
+         buildButton = new JButton("Build");
+         output = new JLabel("output");
+
+         buildButton.addActionListener(new ActionListener() {
+             @Override
+             public void actionPerformed(ActionEvent e) {
+                 output.setText(script.getText());
+
+                 //JOptionPane.showMessageDialog(this, textBox.getText());
+             }
+         });
+
+         return buildButton;
+
+     }
 }
