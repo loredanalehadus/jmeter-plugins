@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 
 import javax.swing.*;
 
@@ -141,6 +142,20 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 
     private JPanel createScriptPanel() {
         script =  JSyntaxTextArea.getInstance(25, 80, false);
+
+        final JPanel panel = new JPanel(new BorderLayout());
+
+        JTextArea linterOutput = new JTextArea("");
+        linterOutput.setLineWrap(true);
+        linterOutput.setEditable(true);
+        linterOutput.setBackground(this.getBackground());
+        panel.add(linterOutput, BorderLayout.SOUTH);
+
+        TestCaretListener testCaretListener = new TestCaretListener(script);
+        script.addCaretListener(testCaretListener);
+        linterOutput.setText(testCaretListener.getNewContents());
+
+
         final JScrollPane scrollPane = JTextScrollPane.getInstance(script, true);
         setScriptContentType("text");
         script.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
@@ -148,7 +163,6 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         final JLabel label = new JLabel("Script (see below for variables that are defined)");
         label.setLabelFor(script);
 
-        final JPanel panel = new JPanel(new BorderLayout());
         panel.add(label, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
@@ -168,7 +182,56 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
          buildButton.addActionListener(new ActionListener() {
              @Override
              public void actionPerformed(ActionEvent e) {
-                 output.setText(script.getText());
+                 String linterOutput = "";
+                  String initialContents = null;
+                  String newContents;
+                  JSyntaxTextArea textArea;
+                 newContents = script.getText();
+                 if (initialContents != newContents) {
+                     initialContents = newContents;
+//            try {
+//                FileUtils.writeStringToFile(new File("test.js"),newContents);
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
+                     Process process = null;
+                     try {
+                         process = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", " /c C:\\Users\\l.lehadus\\AppData\\Roaming\\npm\\jshint.cmd C:\\Users\\l.lehadus\\Desktop\\jshinttest\\test.js").start();
+
+                     } catch (IOException e1) {
+                         // TODO Auto-generated catch block
+                         e1.printStackTrace();
+                     }
+                     InputStream inputStream = process.getInputStream();
+                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                     BufferedReader br = new BufferedReader(inputStreamReader);
+
+                     OutputStream outputStream = process.getOutputStream();
+                     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream);
+                     BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
+
+                     try {
+                         bufferedWriter.write(newContents);
+                     } catch (IOException e1) {
+                         // TODO Auto-generated catch block
+                         e1.printStackTrace();
+                     }
+
+                     String line;
+
+
+                     try {
+                         while ((line = br.readLine()) != null) {
+                             linterOutput += line;
+                         }
+                     } catch (IOException ex) {
+
+                     }
+                 }
+
+
+
+                 output.setText(linterOutput);
 
                  //JOptionPane.showMessageDialog(this, textBox.getText());
              }
