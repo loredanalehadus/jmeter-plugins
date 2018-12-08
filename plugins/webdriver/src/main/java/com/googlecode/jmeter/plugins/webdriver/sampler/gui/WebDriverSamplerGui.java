@@ -1,13 +1,13 @@
 package com.googlecode.jmeter.plugins.webdriver.sampler.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 
 import javax.swing.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JSR223BeanInfoSupport;
@@ -15,6 +15,8 @@ import org.apache.jmeter.util.JSR223BeanInfoSupport;
 import com.googlecode.jmeter.plugins.webdriver.sampler.WebDriverSampler;
 
 import kg.apc.jmeter.JMeterPluginsUtils;
+import org.omg.CORBA.Environment;
+import sun.misc.JavaLangAccess;
 
 public class WebDriverSamplerGui extends AbstractSamplerGui {
 
@@ -25,7 +27,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     com.googlecode.jmeter.plugins.webdriver.sampler.gui.JSyntaxTextArea script;
     JComboBox<String> languages;
     JButton buildButton;
-    JLabel output;
+    TextArea output;
+    JLabel pathOutput;
     JTextField cmdPath;
     JTextField jshintPath;
     JPanel jshintPanel;
@@ -96,6 +99,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         box.add(createJshintPanel());
         box.add(createBuildButton());
         box.add(output);
+        box.add(pathOutput);
         add(box, BorderLayout.NORTH);
 
         JPanel panel = createScriptPanel();
@@ -200,7 +204,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 
      private JButton createBuildButton(){
          buildButton = new JButton("Build");
-         output = new JLabel("output");
+         output = new TextArea("");
+         pathOutput = new JLabel("Path output");
 
          buildButton.addActionListener(new ActionListener() {
              @Override
@@ -210,6 +215,9 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                   String newContents;
                   JSyntaxTextArea textArea;
                  newContents = script.getText();
+                 String path = null;
+                 String pathEscaped = null;
+                 String jshintExec = null;
                  if (initialContents != newContents) {
                      initialContents = newContents;
 //            try {
@@ -217,9 +225,24 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 //            } catch (IOException e1) {
 //                e1.printStackTrace();
 //            }
+
+                     try {
+                         File file = new File("E:\\jmeter\\test.js");
+                         FileUtils.writeStringToFile(file, script.getText());
+
+
+                        path= file.getAbsolutePath();
+
+                     } catch (IOException e1) {
+                         e1.printStackTrace();
+                     }
+                    // pathEscaped = "\"" + path + "\"";
+                      jshintExec =" /c C:\\Users\\l.lehadus\\AppData\\Roaming\\npm\\jshint.cmd " + path;
+
                      Process process = null;
                      try {
-                         process = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", " /c C:\\Users\\l.lehadus\\AppData\\Roaming\\npm\\jshint.cmd C:\\Users\\l.lehadus\\Desktop\\jshinttest\\test.js").start();
+                       //  process = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", " /c C:\\Users\\l.lehadus\\AppData\\Roaming\\npm\\jshint.cmd C:\\Users\\l.lehadus\\Desktop\\jshinttest\\test.js").start();
+                        process = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", jshintExec).start();
 
                      } catch (IOException e1) {
                          // TODO Auto-generated catch block
@@ -252,9 +275,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                      }
                  }
 
-
-
-                 output.setText(linterOutput);
+                 output.setText(linterOutput.replaceAll("[.]","\n"));
+                 output.setForeground(Color.red);
 
                  //JOptionPane.showMessageDialog(this, textBox.getText());
              }
