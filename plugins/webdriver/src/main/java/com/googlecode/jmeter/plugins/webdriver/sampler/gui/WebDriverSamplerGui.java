@@ -28,11 +28,11 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     JComboBox<String> languages;
     JButton buildButton;
     TextArea output;
-    JLabel pathOutput;
     JTextField cmdPath;
     JTextField jshintPath;
     JPanel jshintPanel;
     JPanel cmdPanel;
+    JPanel errorsPanel;
 
     public WebDriverSamplerGui() {
         createGui();
@@ -82,6 +82,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 
         parameters.setText(""); 
         script.setText(WebDriverSampler.defaultScript); 
+        parameters.setText("");
+        script.setText(WebDriverSampler.defaultScript);
         languages.setSelectedItem(WebDriverSampler.DEFAULT_ENGINE);
         cmdPath.setText("");
         jshintPath.setText("");
@@ -98,8 +100,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         box.add(createCmdPanel());
         box.add(createJshintPanel());
         box.add(createBuildButton());
-        box.add(output);
-        box.add(pathOutput);
+        box.add(createErrorsPanel());
         add(box, BorderLayout.NORTH);
 
         JPanel panel = createScriptPanel();
@@ -154,6 +155,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         cmdPanel.setVisible(false);
         jshintPanel.setVisible(false);
         buildButton.setVisible(false);
+        errorsPanel.setVisible(false);
 
         String text = script.getText();
         script.setLanguage(ctype.toLowerCase());
@@ -164,6 +166,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
             cmdPanel.setVisible(true);
             jshintPanel.setVisible(true);
             buildButton.setVisible(true);
+            errorsPanel.setVisible(true);
         }
     }
 
@@ -205,8 +208,6 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
      private JButton createBuildButton(){
          buildButton = new JButton("Build");
          output = new TextArea("");
-         pathOutput = new JLabel("Path output");
-
          buildButton.addActionListener(new ActionListener() {
              @Override
              public void actionPerformed(ActionEvent e) {
@@ -220,14 +221,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                  String jshintExec = null;
                  if (initialContents != newContents) {
                      initialContents = newContents;
-//            try {
-//                FileUtils.writeStringToFile(new File("test.js"),newContents);
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-
                      try {
-                         File file = new File("E:\\jmeter\\test.js");
+                         File file = File.createTempFile("test", "js");
                          FileUtils.writeStringToFile(file, script.getText());
 
                         path= file.getAbsolutePath();
@@ -235,12 +230,10 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                      } catch (IOException e1) {
                          e1.printStackTrace();
                      }
-                    // pathEscaped = "\"" + path + "\"";
                      jshintExec =" /c " + jshintPath.getText() + " " + path;
                      Process process = null;
 
                      try {
-                       //  process = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", " /c C:\\Users\\l.lehadus\\AppData\\Roaming\\npm\\jshint.cmd C:\\Users\\l.lehadus\\Desktop\\jshinttest\\test.js").start();
                         process = new ProcessBuilder(cmdPath.getText(), jshintExec).start();
                      } catch (IOException e1) {
                          // TODO Auto-generated catch block
@@ -275,8 +268,6 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 
                  output.setText(linterOutput.replaceAll("[.]","\n"));
                  output.setForeground(Color.red);
-
-                 //JOptionPane.showMessageDialog(this, textBox.getText());
              }
          });
 
@@ -310,5 +301,11 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         jshintPanel.add(jshintPath, BorderLayout.CENTER);
 
         return jshintPanel;
+    }
+
+    private JPanel createErrorsPanel(){
+        errorsPanel= new JPanel(new BorderLayout(5, 0));
+        errorsPanel.add(output, BorderLayout.CENTER);
+        return errorsPanel;
     }
 }
