@@ -230,20 +230,18 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                          File file = new File("E:\\jmeter\\test.js");
                          FileUtils.writeStringToFile(file, script.getText());
 
-
                         path= file.getAbsolutePath();
 
                      } catch (IOException e1) {
                          e1.printStackTrace();
                      }
                     // pathEscaped = "\"" + path + "\"";
-                      jshintExec =" /c C:\\Users\\l.lehadus\\AppData\\Roaming\\npm\\jshint.cmd " + path;
-
+                     jshintExec =" /c " + jshintPath.getText() + " " + path;
                      Process process = null;
+
                      try {
                        //  process = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", " /c C:\\Users\\l.lehadus\\AppData\\Roaming\\npm\\jshint.cmd C:\\Users\\l.lehadus\\Desktop\\jshinttest\\test.js").start();
-                        process = new ProcessBuilder("C:\\Windows\\System32\\cmd.exe", jshintExec).start();
-
+                        process = new ProcessBuilder(cmdPath.getText(), jshintExec).start();
                      } catch (IOException e1) {
                          // TODO Auto-generated catch block
                          e1.printStackTrace();
