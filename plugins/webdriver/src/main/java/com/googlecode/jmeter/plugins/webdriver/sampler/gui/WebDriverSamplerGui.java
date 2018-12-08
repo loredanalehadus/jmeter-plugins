@@ -1,22 +1,15 @@
 package com.googlecode.jmeter.plugins.webdriver.sampler.gui;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-
 import javax.swing.*;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JSR223BeanInfoSupport;
-
 import com.googlecode.jmeter.plugins.webdriver.sampler.WebDriverSampler;
-
 import kg.apc.jmeter.JMeterPluginsUtils;
-import org.omg.CORBA.Environment;
-import sun.misc.JavaLangAccess;
 
 public class WebDriverSamplerGui extends AbstractSamplerGui {
 
@@ -32,7 +25,6 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     JTextField jshintPath;
     JPanel jshintPanel;
     JPanel cmdPanel;
-    JPanel errorsPanel;
 
     public WebDriverSamplerGui() {
         createGui();
@@ -103,17 +95,13 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
 
         add(box, BorderLayout.NORTH);
 
-
         JPanel panel = createScriptPanel();
         add(panel, BorderLayout.CENTER);
 
-        JPanel panelErrors = createErrorsPanel();
-        add(panelErrors, BorderLayout.SOUTH);
+        add(createErrorsPanel(), BorderLayout.SOUTH);
 
         // Don't let the input field shrink too much
         add(Box.createVerticalStrut(panel.getPreferredSize().height), BorderLayout.WEST);
-        output.setForeground(Color.red);
-        output.setBackground(Color.black);
     }
 
     private JPanel createParameterPanel() {
@@ -188,11 +176,6 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         linterOutput.setBackground(this.getBackground());
         panel.add(linterOutput, BorderLayout.SOUTH);
 
-        TestCaretListener testCaretListener = new TestCaretListener(script);
-        script.addCaretListener(testCaretListener);
-        linterOutput.setText(testCaretListener.getNewContents());
-
-
         final JScrollPane scrollPane = JTextScrollPane.getInstance(script, true);
         setScriptContentType("text");
         script.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
@@ -219,12 +202,11 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
              @Override
              public void actionPerformed(ActionEvent e) {
                  String linterOutput = "";
-                  String initialContents = null;
-                  String newContents;
-                  JSyntaxTextArea textArea;
+                 String initialContents = null;
+                 String newContents;
+
                  newContents = script.getText();
                  String path = null;
-                 String pathEscaped = null;
                  String jshintExec = null;
                  if (initialContents != newContents) {
                      initialContents = newContents;
@@ -246,6 +228,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                          // TODO Auto-generated catch block
                          e1.printStackTrace();
                      }
+
                      InputStream inputStream = process.getInputStream();
                      InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                      BufferedReader br = new BufferedReader(inputStreamReader);
@@ -262,8 +245,6 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                      }
 
                      String line;
-
-
                      try {
                          while ((line = br.readLine()) != null) {
                              linterOutput += line;
@@ -274,7 +255,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                  }
 
                  output.setText(linterOutput.replaceAll("[.]","\n"));
-                     }
+             }
          });
 
          return buildButton;
@@ -310,7 +291,10 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     }
 
     private JPanel createErrorsPanel(){
-       JPanel errorsPanel= new JPanel(new BorderLayout(5, 0));
+        JPanel errorsPanel= new JPanel(new BorderLayout(5, 0));
+        output.setForeground(Color.red);
+        output.setBackground(Color.black);
+
         errorsPanel.add(output, BorderLayout.CENTER);
         return errorsPanel;
     }
