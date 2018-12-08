@@ -80,8 +80,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     public void clearGui() {
         super.clearGui();
 
-        parameters.setText(""); 
-        script.setText(WebDriverSampler.defaultScript); 
+        parameters.setText("");
+        script.setText(WebDriverSampler.defaultScript);
         parameters.setText("");
         script.setText(WebDriverSampler.defaultScript);
         languages.setSelectedItem(WebDriverSampler.DEFAULT_ENGINE);
@@ -100,13 +100,20 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         box.add(createCmdPanel());
         box.add(createJshintPanel());
         box.add(createBuildButton());
-        box.add(createErrorsPanel());
+
         add(box, BorderLayout.NORTH);
+
 
         JPanel panel = createScriptPanel();
         add(panel, BorderLayout.CENTER);
+
+        JPanel panelErrors = createErrorsPanel();
+        add(panelErrors, BorderLayout.SOUTH);
+
         // Don't let the input field shrink too much
         add(Box.createVerticalStrut(panel.getPreferredSize().height), BorderLayout.WEST);
+        output.setForeground(Color.red);
+        output.setBackground(Color.black);
     }
 
     private JPanel createParameterPanel() {
@@ -152,10 +159,10 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     }
 
     private void setScriptContentType(String ctype) {
-        cmdPanel.setVisible(false);
+        output.setVisible(false);
         jshintPanel.setVisible(false);
         buildButton.setVisible(false);
-        errorsPanel.setVisible(false);
+        output.setText("");
 
         String text = script.getText();
         script.setLanguage(ctype.toLowerCase());
@@ -166,7 +173,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
             cmdPanel.setVisible(true);
             jshintPanel.setVisible(true);
             buildButton.setVisible(true);
-            errorsPanel.setVisible(true);
+            output.setVisible(true);
         }
     }
 
@@ -269,8 +276,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
                  }
 
                  output.setText(linterOutput.replaceAll("[.]","\n"));
-                 output.setForeground(Color.red);
-             }
+                     }
          });
 
          return buildButton;
@@ -306,7 +312,7 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     }
 
     private JPanel createErrorsPanel(){
-        errorsPanel= new JPanel(new BorderLayout(5, 0));
+       JPanel errorsPanel= new JPanel(new BorderLayout(5, 0));
         errorsPanel.add(output, BorderLayout.CENTER);
         return errorsPanel;
     }
