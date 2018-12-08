@@ -23,6 +23,18 @@ public final class WebDriverScriptable {
     private Properties props;
     private JMeterContext ctx;
 
+
+    private String cmdPath;
+    private String jshintPath;
+
+    public void setCmdPath(String cmdPath) {this.cmdPath = cmdPath; }
+
+    public String getCmdPath() { return cmdPath;}
+
+    public void setJshintPath(String jshintPath){ this.jshintPath = jshintPath; }
+
+    public String getJshintPath() { return jshintPath; }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -70,7 +82,9 @@ public final class WebDriverScriptable {
     public void setVars(JMeterVariables variables) {
         this.vars = variables;
     }
+/*
 
+*/
     /**
      * @return the variables
      */

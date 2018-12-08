@@ -22,6 +22,7 @@ import org.openqa.selenium.WebDriver;
 import com.googlecode.jmeter.plugins.webdriver.config.WebDriverConfig;
 
 import kg.apc.jmeter.JMeterPluginsUtils;
+import org.openxmlformats.schemas.presentationml.x2006.main.CmAuthorLstDocument;
 
 
 /**
@@ -36,6 +37,8 @@ public class WebDriverSampler extends AbstractSampler {
     private static final Logger LOGGER = LoggingManager.getLoggerForClass();
     public static final String DEFAULT_ENGINE = "javascript";
     public static final String SCRIPT_LANGUAGE = "WebDriverSampler.language";
+    public static final String CMD_PATH = "WebDriverSampler.cmdPath";
+    public static final String JSHINT_PATH = "WebDriverSampler.jshintPath";
     private final transient ScriptEngineManager scriptEngineManager;
     private final Class<SampleResult> sampleResultClass;
 
@@ -49,6 +52,7 @@ public class WebDriverSampler extends AbstractSampler {
         String className = JMeterUtils.getPropDefault("webdriver.sampleresult_class", SampleResult.class.getCanonicalName());
         try {
             srClass = (Class<SampleResult>) Class.forName(className);
+
         } catch (ClassNotFoundException e) {
             LOGGER.warn("Class " + className + " not found, defaulted to " + SampleResult.class.getCanonicalName(), e);
             srClass = SampleResult.class;
@@ -136,6 +140,15 @@ public class WebDriverSampler extends AbstractSampler {
         setProperty(SCRIPT_LANGUAGE, lang);
     }
 
+    public void setCmdPath(String path){ setProperty(CMD_PATH, path); }
+
+    public String getCmdPath(){ return getPropertyAsString(CMD_PATH); }
+
+    public void setJshintPath(String path){ setProperty(JSHINT_PATH, path); }
+
+    public String getJshintPath(){ return getPropertyAsString(JSHINT_PATH);}
+
+
     private WebDriver getWebDriver() {
         return (WebDriver) getThreadContext().getVariables().getObject(WebDriverConfig.BROWSER);
     }
@@ -146,6 +159,8 @@ public class WebDriverSampler extends AbstractSampler {
         WebDriverScriptable scriptable = new WebDriverScriptable();
         scriptable.setName(getName());
         scriptable.setParameters(getParameters());
+        scriptable.setCmdPath(getCmdPath());
+        scriptable.setJshintPath(getJshintPath());
         JMeterContext context = JMeterContextService.getContext();
         scriptable.setVars(context.getVariables());
         scriptable.setProps(JMeterUtils.getJMeterProperties());

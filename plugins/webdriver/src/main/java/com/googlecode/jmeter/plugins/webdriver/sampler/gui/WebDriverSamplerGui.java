@@ -26,6 +26,10 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     JComboBox<String> languages;
     JButton buildButton;
     JLabel output;
+    JTextField cmdPath;
+    JTextField jshintPath;
+    JPanel jshintPanel;
+    JPanel cmdPanel;
 
     public WebDriverSamplerGui() {
         createGui();
@@ -45,6 +49,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     public void configure(TestElement element) {
         script.setText(element.getPropertyAsString(WebDriverSampler.SCRIPT));
         parameters.setText(element.getPropertyAsString(WebDriverSampler.PARAMETERS));
+        cmdPath.setText(element.getPropertyAsString(WebDriverSampler.CMD_PATH));
+        jshintPath.setText(element.getPropertyAsString(WebDriverSampler.JSHINT_PATH));
         languages.setSelectedItem(element.getPropertyAsString(WebDriverSampler.SCRIPT_LANGUAGE));
         super.configure(element);
     }
@@ -63,6 +69,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         element.setProperty(WebDriverSampler.SCRIPT, script.getText());
         element.setProperty(WebDriverSampler.PARAMETERS, parameters.getText());
         element.setProperty(WebDriverSampler.SCRIPT_LANGUAGE, (String) languages.getSelectedItem());
+        element.setProperty(WebDriverSampler.CMD_PATH, cmdPath.getText());
+        element.setProperty(WebDriverSampler.JSHINT_PATH, jshintPath.getText());
     }
 
     @Override
@@ -72,6 +80,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         parameters.setText(""); 
         script.setText(WebDriverSampler.defaultScript); 
         languages.setSelectedItem(WebDriverSampler.DEFAULT_ENGINE);
+        cmdPath.setText("");
+        jshintPath.setText("");
     }
 
     private void createGui() {
@@ -82,6 +92,8 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
         box.add(JMeterPluginsUtils.addHelpLinkToPanel(makeTitlePanel(), "WebDriverSampler"));
         box.add(createParameterPanel());
         box.add(createLangPanel());
+        box.add(createCmdPanel());
+        box.add(createJshintPanel());
         box.add(createBuildButton());
         box.add(output);
         add(box, BorderLayout.NORTH);
@@ -135,9 +147,20 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
     }
 
     private void setScriptContentType(String ctype) {
+        cmdPanel.setVisible(false);
+        jshintPanel.setVisible(false);
+        buildButton.setVisible(false);
+
         String text = script.getText();
         script.setLanguage(ctype.toLowerCase());
         script.setText(text);
+
+        if (ctype.toLowerCase().equals("javascript") || ctype.toLowerCase().equals("js"))
+        {
+            cmdPanel.setVisible(true);
+            jshintPanel.setVisible(true);
+            buildButton.setVisible(true);
+        }
     }
 
     private JPanel createScriptPanel() {
@@ -240,4 +263,32 @@ public class WebDriverSamplerGui extends AbstractSamplerGui {
          return buildButton;
 
      }
+
+     private JPanel createCmdPanel(){
+         final JLabel label = new JLabel("Cmd path:");
+
+         cmdPath = new JTextField(10);
+         cmdPath.setName(WebDriverSampler.CMD_PATH);
+         label.setLabelFor(cmdPath);
+
+         cmdPanel = new JPanel(new BorderLayout(5, 0));
+         cmdPanel.add(label, BorderLayout.WEST);
+         cmdPanel.add(cmdPath, BorderLayout.CENTER);
+
+         return cmdPanel;
+     }
+
+    private JPanel createJshintPanel(){
+        final JLabel label = new JLabel("JsHint path:");
+
+        jshintPath = new JTextField(10);
+        jshintPath.setName(WebDriverSampler.JSHINT_PATH);
+        label.setLabelFor(jshintPath);
+
+        jshintPanel = new JPanel(new BorderLayout(5, 0));
+        jshintPanel.add(label, BorderLayout.WEST);
+        jshintPanel.add(jshintPath, BorderLayout.CENTER);
+
+        return jshintPanel;
+    }
 }
